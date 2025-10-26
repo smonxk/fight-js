@@ -14,17 +14,33 @@ const LOG_EVENT_HEAL = "HEAL";
 const LOG_EVENT_BONUS_LIFE = "BONUS_LIFE";
 const LOG_EVENT_GAME_OVER = "GAME_OVER";
 
-const enteredValue = prompt("Maximum life for you and the monster?", "100");
-let chosenMaxLife = parseInt(enteredValue);
-if (isNaN(chosenMaxLife) || chosenMaxLife <= 0) {
-  //kdyz nelze prompt prevest na int
+function getMaxLife(){
+  const enteredValue = prompt("Maximum life for you and the monster?", "100");
+  const parsedValue = parseInt(enteredValue);
+  if (isNaN(parsedValue) || parsedValue <= 0) {
+    throw {message: "Invalid user input!"};
+  }
+  return parsedValue;
+}
+
+let chosenMaxLife;
+
+try {
+  chosenMaxLife = getMaxLife();
+} catch(error) {
+  console.log(error);
   chosenMaxLife = 100;
+  alert("You entered something wrong, default value of 100 was used.");
+} finally {
+
+  
 }
 
 let currentMonsterHealth = chosenMaxLife;
 let currentPlayerHealth = chosenMaxLife;
 let hasBonusLife = true;
 let battleLog = [];
+let lastLoggedEntry;
 
 adjustHealthBars(chosenMaxLife);
 
@@ -40,15 +56,7 @@ function attackMonster(mode) {
         ? LOG_EVENT_PLAYER_ATTACK
         : LOG_EVENT_PLAYER_STRONG_ATTACK;
   
-    // let logEvent;
-    // if(mode === MODE_ATTACK){
-    //     maxDamage = ATTACK_VALUE;
-    //     logEvent = LOG_EVENT_PLAYER_ATTACK;
-    // } else if(mode === MODE_STRONG_ATTACK) {
-    //     maxDamage = STRONG_ATTACK_VALUE;
-    //     logEvent = LOG_EVENT_PLAYER_STRONG_ATTACK;
-    // }
-    const damage = dealMonsterDamage(maxDamage);
+ damage = dealMonsterDamage(maxDamage);
     currentMonsterHealth -= damage;
     writeToLog(logEvent, damage, currentMonsterHealth, currentPlayerHealth);
     endRound();
@@ -176,5 +184,19 @@ function writeToLog(event, value, monsterHealth, playerHealth) {
 }
 
 function printLogHandler() {
-  console.log(battleLog);
+ // console.log(battleLog);
+
+  let i = 0;
+  for(const logEntry of battleLog){
+    if(!lastLoggedEntry && lastLoggedEntry !== 0 || lastLoggedEntry < i){
+      console.log(`turn num:${i}`);
+      for(const key in logEntry){
+        console.log(`${key} => ${logEntry[key]}`); 
+      }
+        lastLoggedEntry = i;
+        break;
+    }
+   
+    i++;
+  }
 }
