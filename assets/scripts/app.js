@@ -103,6 +103,7 @@ function endRound() {
       currentMonsterHealth,
       currentPlayerHealth
     );
+    printLogHandler();
   } else if (currentPlayerHealth <= 0 && currentMonsterHealth > 0) {
     alert("You lost!");
     writeToLog(
@@ -111,6 +112,7 @@ function endRound() {
       currentMonsterHealth,
       currentPlayerHealth
     );
+    printLogHandler();
   } else if (currentPlayerHealth <= 0 && currentMonsterHealth <= 0) {
     writeToLog(
       LOG_EVENT_GAME_OVER,
@@ -118,6 +120,7 @@ function endRound() {
       currentMonsterHealth,
       currentPlayerHealth
     );
+    printLogHandler();
   }
 
   if (currentMonsterHealth <= 0 || currentPlayerHealth <= 0) {
@@ -163,18 +166,23 @@ function writeToLog(event, value, monsterHealth, playerHealth) {
   switch (event) {
     case LOG_EVENT_PLAYER_ATTACK:
       logEntry.target = "MONSTER";
+      logEntry.initiator = "PLAYER";
       break;
     case LOG_EVENT_PLAYER_STRONG_ATTACK:
       logEntry.target = "MONSTER";
+      logEntry.initiator = "PLAYER";
       break;
     case LOG_EVENT_MONSTER_ATTACK:
       logEntry.target = "PLAYER";
+      logEntry.initiator = "MONSTER";
       break;
     case LOG_EVENT_HEAL:
       logEntry.target = "PLAYER";
+      logEntry.initiator = "PLAYER";
       break;
     case LOG_EVENT_BONUS_LIFE:
       logEntry.target = "PLAYER";
+      logEntry.initiator = "PLAYER";
       break;
     case LOG_EVENT_GAME_OVER:
       break;
@@ -184,19 +192,46 @@ function writeToLog(event, value, monsterHealth, playerHealth) {
 }
 
 function printLogHandler() {
- // console.log(battleLog);
+  for (let i = 0; i < battleLog.length; i++){
+    console.log(`Turn #${i + 1}`);
+    logContent(battleLog[i])
+  }
+}
 
-  let i = 0;
-  for(const logEntry of battleLog){
-    if(!lastLoggedEntry && lastLoggedEntry !== 0 || lastLoggedEntry < i){
-      console.log(`turn num:${i}`);
-      for(const key in logEntry){
-        console.log(`${key} => ${logEntry[key]}`); 
-      }
-        lastLoggedEntry = i;
+function logContent(contentInputEntry){
+  let mode = contentInputEntry.event === LOG_EVENT_PLAYER_ATTACK || LOG_EVENT_MONSTER_ATTACK ? "basic attack" : "ultimate";
+
+  switch(contentInputEntry.event){
+    case LOG_EVENT_PLAYER_ATTACK:
+    case LOG_EVENT_PLAYER_STRONG_ATTACK:
+    case LOG_EVENT_MONSTER_ATTACK:
+      console.log(`${contentInputEntry.initiator} attacked ${contentInputEntry.target} with ${mode}! 
+        Damage dealt: ${contentInputEntry.value}!`);
+      console.log(`Player health: ${contentInputEntry.finalPlayerHealth}`);
+      console.log(`Monster healh: ${contentInputEntry.finalMonsterHealth}`);
+      break;
+    case LOG_EVENT_HEAL:
+      console.log(`${contentInputEntry.initiator} healed ${contentInputEntry.target} with heal!`);
+      console.log(`Player health: ${contentInputEntry.finalPlayerHealth}`);
+      console.log(`Monster healh: ${contentInputEntry.finalMonsterHealth}`);
+      break;
+    case LOG_EVENT_BONUS_LIFE:
+      console.log(`${contentInputEntry.initiator} revived ${contentInputEntry.target}!`);
+      console.log(`Player health: ${contentInputEntry.finalPlayerHealth}`);
+      console.log(`Monster healh: ${contentInputEntry.finalMonsterHealth}`);
+      break;
+    case LOG_EVENT_GAME_OVER:
+      switch(contentInputEntry.value){
+        case "PLAYER WON":
+          console.log("You excelled in an outstanding fight! Bravo!");
+          break;
+        case "MONSTER WON":
+          console.log("Oh no... you snatched defeat from the jaws of victory. Better luck next time!");
+          break;
+        case "DRAW":
+          console.log("Deadlock!");
         break;
-    }
-   
-    i++;
+      }
+      break;
   }
 }

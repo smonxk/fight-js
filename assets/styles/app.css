@@ -3,49 +3,67 @@ html {
 }
 
 body {
-  background: #2c2c2c;
+  background: #ffffff;
+  font-family: "Silkscreen", sans-serif;
 }
 
 h2 {
-  font-size: 1.25rem;
-  margin: 1rem 0.5rem;
+  font-size: 0.7rem;
+  margin: 0.6rem 0.5rem;
+}
+
+h2:first-of-type{
+  margin-top: 0;
 }
 
 progress {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  width: 80%;
-  height: 2rem;
+  width: 70%;
+  height: 1.2em;
   color: #ff0062;
-  border: 1px solid #a927f5;
+  border: 3px solid hsl(0, 0%, 0%);
+  border-radius: 35px;
+
 }
 
 progress[value]::-webkit-progress-bar,
 progress[value] {
   background-color: #eee;
+  border-radius: 35px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
 }
 
 progress[value]::-webkit-progress-value {
-  background-color: #a927f5;
+  background: linear-gradient(to right, #2af527, #8fffda),
+            radial-gradient(at 30% 30%, rgba(255,255,255,0.4), transparent 70%);
+  background-blend-mode: screen;
   transition: all 0.2s ease-out;
+  border-radius: 35px;
 }
 
 progress[value]::-moz-progress-bar {
-  background-color: #a927f5;
+  background: linear-gradient(to right, #a927f5, #dba4ff),
+            radial-gradient(at 30% 30%, rgba(255,255,255,0.4), transparent 70%);
+background-blend-mode: screen;
+
   transition: all 0.2s ease-out;
+  border-radius: 35px;
 }
 
 button {
   font: inherit;
+  font-size: 0.8em;
   background: #ff0062;
   border: 1px solid #ff0062;
   color: white;
-  padding: 1rem 2rem;
-  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  border-radius: 35px;
   cursor: pointer;
   margin: 0.5rem;
+  min-width: 20%;
+  min-height: 7%;
 }
 
 button:focus {
@@ -59,19 +77,33 @@ button:active {
 }
 
 #health-levels,
-#controls {
-  margin: 2rem auto;
-  width: 30rem;
+#controls, #pictures {
+  margin: 1rem auto;
+  width: 20rem;
   text-align: center;
-  border-radius: 10px;
+  border-radius: 35px;
   padding: 1rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-  background: white;
+  background: rgb(251, 253, 255);
+}
+
+#health-levels {
+  max-height: 15vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#pictures {
+  min-height: 36vh;
 }
 
 #controls {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid: repeat(2, 1fr) / repeat(2, 1fr);
+  height: 20vh;
+  font-size: 0.9em;
 }
 
 #bonus-life {
@@ -83,4 +115,35 @@ button:active {
   border-radius: 10px;
   text-align: center;
   margin: 0 0.5rem;
+}
+#navbar {
+  justify-self: center;
+  width: 90%;
+}
+
+#navbar button {
+  min-width: 33%;
+}
+
+#navbar button:first-of-type {
+  padding: 0.5em;
+  background-color: lightblue;
+  border: none;
+}
+
+#navbar button:nth-of-type(2){
+  padding: 0.5em;
+  background-color: red;
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between
+}
+
+nav a {
+  text-decoration: none;
+  color: white;
 }
