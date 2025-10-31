@@ -31,10 +31,7 @@ try {
   console.log(error);
   chosenMaxLife = 100;
   alert("You entered something wrong, default value of 100 was used.");
-} finally {
-
-  
-}
+} 
 
 let currentMonsterHealth = chosenMaxLife;
 let currentPlayerHealth = chosenMaxLife;
@@ -56,9 +53,10 @@ function attackMonster(mode) {
         ? LOG_EVENT_PLAYER_ATTACK
         : LOG_EVENT_PLAYER_STRONG_ATTACK;
   
- damage = dealMonsterDamage(maxDamage);
+    const damage = dealMonsterDamage(maxDamage);
     currentMonsterHealth -= damage;
     writeToLog(logEvent, damage, currentMonsterHealth, currentPlayerHealth);
+    checkHealthColor(monsterHealthBar);
     endRound();
 }
 
@@ -74,6 +72,7 @@ function endRound() {
   const initialPlayerHealth = currentPlayerHealth;
   const damagePlayer = dealPlayerDamage(MONSTER_ATTACK_VALUE);
   currentPlayerHealth -= damagePlayer;
+  checkHealthColor(playerHealthBar);
   writeToLog(
     LOG_EVENT_MONSTER_ATTACK,
     damagePlayer,
@@ -138,6 +137,7 @@ function healPlayerHandler() {
   }
   increasePlayerHealth(healValue);
   currentPlayerHealth += healValue;
+  checkHealthColor(playerHealthBar);
   writeToLog(
     LOG_EVENT_HEAL,
     healValue,
@@ -151,6 +151,8 @@ function reset() {
   currentMonsterHealth = chosenMaxLife;
   currentPlayerHealth = chosenMaxLife;
   resetGame(chosenMaxLife);
+  checkHealthColor(monsterHealthBar);
+  checkHealthColor(playerHealthBar);
   hasBonusLife = true;
   addBonusLife();
 }
@@ -233,5 +235,19 @@ function logContent(contentInputEntry){
         break;
       }
       break;
+  }
+}
+
+function checkHealthColor(healthBar){
+  if(healthBar.value < (chosenMaxLife * 0.25)){
+    healthBar.style.setProperty('--color1', '#ff1100ff');
+    healthBar.style.setProperty('--color2', '#ed6850ff');
+    console.log(healthBar.value , "Color changed")
+  } else if (healthBar.value < (chosenMaxLife * 0.5)){
+    healthBar.style.setProperty('--color1', '#ffa200ff');
+    healthBar.style.setProperty('--color2', '#edc650ff');
+  } else {
+    healthBar.style.setProperty('--color1', '#2af527');
+    healthBar.style.setProperty('--color2', '#8fffda');
   }
 }
