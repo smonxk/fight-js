@@ -4,7 +4,7 @@ const MONSTER_ATTACK_VALUE = 14;
 const HEAL_VALUE = 15;
 
 const MODE_ATTACK = "ATTACK";
-const MODE_STRONG_ATTACK = "STRONG_ATTACK"; //vytvorenim globalnich prom. predchazime tomu, ze bychom ve funkci attackMonster udelali typo
+const MODE_STRONG_ATTACK = "STRONG_ATTACK"; //vytvorenim globalnich prom. predchazim tomu, ze bych ve funkci attackMonster udelala typo :')
 
 //event logs
 const LOG_EVENT_PLAYER_ATTACK = "PLAYER_ATTACK";
@@ -24,6 +24,7 @@ function getMaxLife(){
 }
 
 let chosenMaxLife;
+let iteration = 0;
 
 try {
   chosenMaxLife = getMaxLife();
@@ -45,20 +46,10 @@ attackBtn.addEventListener("click", attackHandler);
 strongAttackBtn.addEventListener("click", strongAttackHandler);
 healBtn.addEventListener("click", healPlayerHandler);
 logBtn.addEventListener("click", printLogHandler);
+backdrop.addEventListener("click", backdropHandler);
+closeLogBtn.addEventListener("click", closeLogBtnHandler);
 
-function attackMonster(mode) {
-    const maxDamage = mode === MODE_ATTACK ? ATTACK_VALUE : STRONG_ATTACK_VALUE;
-    const logEvent =
-        mode === MODE_ATTACK
-        ? LOG_EVENT_PLAYER_ATTACK
-        : LOG_EVENT_PLAYER_STRONG_ATTACK;
-  
-    const damage = dealMonsterDamage(maxDamage);
-    currentMonsterHealth -= damage;
-    writeToLog(logEvent, damage, currentMonsterHealth, currentPlayerHealth);
-    checkHealthColor(monsterHealthBar);
-    endRound();
-}
+//handlers
 
 function attackHandler() {
   attackMonster(MODE_ATTACK);
@@ -67,6 +58,53 @@ function attackHandler() {
 function strongAttackHandler() {
   attackMonster(MODE_STRONG_ATTACK);
 }
+
+function healPlayerHandler() {
+  let healValue;
+  if (currentPlayerHealth >= chosenMaxLife - HEAL_VALUE) {
+    alert("You can't heal to more than your max initial health.");
+    healValue = chosenMaxLife - currentPlayerHealth;
+  } else {
+    healValue = HEAL_VALUE;
+  }
+  increasePlayerHealth(healValue);
+  currentPlayerHealth += healValue;
+  checkHealthColor(playerHealthBar);
+  writeToLog(
+    LOG_EVENT_HEAL,
+    healValue,
+    currentMonsterHealth,
+    currentPlayerHealth
+  );
+  endRound();
+}
+
+function printLogHandler() {
+  toggleBackdrop();
+  toggleLogModal();
+  
+  for (const battle of battleLog){
+      const logTurnContent = document.createElement("div");
+      logTurnContent.innerHTML = `
+        <h4>Turn #${iteration + 1}</h4>
+        ${logContent(battleLog[iteration])}
+        `;
+      modalLogContent.appendChild(logTurnContent);
+      modalLogContent.scrollTop =  modalLogContent.scrollHeight;
+      iteration++;
+  }
+}
+
+function backdropHandler(){
+  toggleBackdrop();
+  toggleLogModal();
+}
+
+function closeLogBtnHandler(){
+  toggleBackdrop();
+  toggleLogModal();
+}
+//functions
 
 function endRound() {
   const initialPlayerHealth = currentPlayerHealth;
@@ -127,24 +165,18 @@ function endRound() {
   }
 }
 
-function healPlayerHandler() {
-  let healValue;
-  if (currentPlayerHealth >= chosenMaxLife - HEAL_VALUE) {
-    alert("You can't heal to more than your max initial health.");
-    healValue = chosenMaxLife - currentPlayerHealth;
-  } else {
-    healValue = HEAL_VALUE;
-  }
-  increasePlayerHealth(healValue);
-  currentPlayerHealth += healValue;
-  checkHealthColor(playerHealthBar);
-  writeToLog(
-    LOG_EVENT_HEAL,
-    healValue,
-    currentMonsterHealth,
-    currentPlayerHealth
-  );
-  endRound();
+function attackMonster(mode) {
+    const maxDamage = mode === MODE_ATTACK ? ATTACK_VALUE : STRONG_ATTACK_VALUE;
+    const logEvent =
+        mode === MODE_ATTACK
+        ? LOG_EVENT_PLAYER_ATTACK
+        : LOG_EVENT_PLAYER_STRONG_ATTACK;
+  
+    const damage = dealMonsterDamage(maxDamage);
+    currentMonsterHealth -= damage;
+    writeToLog(logEvent, damage, currentMonsterHealth, currentPlayerHealth);
+    checkHealthColor(monsterHealthBar);
+    endRound();
 }
 
 function reset() {
@@ -193,49 +225,59 @@ function writeToLog(event, value, monsterHealth, playerHealth) {
   battleLog.push(logEntry);
 }
 
-function printLogHandler() {
-  for (let i = 0; i < battleLog.length; i++){
-    console.log(`Turn #${i + 1}`);
-    logContent(battleLog[i])
-  }
-}
-
 function logContent(contentInputEntry){
-  let mode = contentInputEntry.event === LOG_EVENT_PLAYER_ATTACK || LOG_EVENT_MONSTER_ATTACK ? "basic attack" : "ultimate";
+  let mode = "";
+  
+  switch(contentInputEntry.event){
+    case LOG_EVENT_PLAYER_ATTACK:
+    case LOG_EVENT_MONSTER_ATTACK:
+      mode = "basic attack";
+      break;
+    case LOG_EVENT_PLAYER_STRONG_ATTACK:
+      mode = "ultimate";
+      break;
+    default:
+      mode="";
+  }
+  
+  let fullLogText = "";
 
   switch(contentInputEntry.event){
     case LOG_EVENT_PLAYER_ATTACK:
     case LOG_EVENT_PLAYER_STRONG_ATTACK:
     case LOG_EVENT_MONSTER_ATTACK:
-      console.log(`${contentInputEntry.initiator} attacked ${contentInputEntry.target} with ${mode}! 
-        Damage dealt: ${contentInputEntry.value}!`);
-      console.log(`Player health: ${contentInputEntry.finalPlayerHealth}`);
-      console.log(`Monster healh: ${contentInputEntry.finalMonsterHealth}`);
+      fullLogText = `${contentInputEntry.initiator} attacked ${contentInputEntry.target} with ${mode}! <br>
+      Damage dealt: ${contentInputEntry.value.toFixed(2)}! <br>
+      Player health: ${contentInputEntry.finalPlayerHealth.toFixed(2)} <br>
+      Monster healh: ${contentInputEntry.finalMonsterHealth.toFixed(2)}`;
       break;
     case LOG_EVENT_HEAL:
-      console.log(`${contentInputEntry.initiator} healed ${contentInputEntry.target} with heal!`);
-      console.log(`Player health: ${contentInputEntry.finalPlayerHealth}`);
-      console.log(`Monster healh: ${contentInputEntry.finalMonsterHealth}`);
+      fullLogText = `${contentInputEntry.initiator} healed ${contentInputEntry.target} with heal! <br>
+      Player health: ${contentInputEntry.finalPlayerHealth.toFixed(2)} <br>
+      Monster healh: ${contentInputEntry.finalMonsterHealth.toFixed(2)}`;
       break;
     case LOG_EVENT_BONUS_LIFE:
-      console.log(`${contentInputEntry.initiator} revived ${contentInputEntry.target}!`);
-      console.log(`Player health: ${contentInputEntry.finalPlayerHealth}`);
-      console.log(`Monster healh: ${contentInputEntry.finalMonsterHealth}`);
+      fullLogText = `${contentInputEntry.initiator} revived ${contentInputEntry.target}! <br>
+      Player health: ${contentInputEntry.finalPlayerHealth.toFixed(2)} <br>
+      Monster healh: ${contentInputEntry.finalMonsterHealth.toFixed(2)}`;
       break;
     case LOG_EVENT_GAME_OVER:
       switch(contentInputEntry.value){
         case "PLAYER WON":
-          console.log("You excelled in an outstanding fight! Bravo!");
+          fullLogText = "You excelled in an outstanding fight! Bravo!";
           break;
         case "MONSTER WON":
-          console.log("Oh no... you snatched defeat from the jaws of victory. Better luck next time!");
+          fullLogText = "Oh no... you snatched defeat from the jaws of victory. Better luck next time!";
           break;
         case "DRAW":
-          console.log("Deadlock!");
+          fullLogText = "Deadlock!";
         break;
       }
       break;
   }
+
+  console.log(fullLogText);
+  return fullLogText;
 }
 
 function checkHealthColor(healthBar){
@@ -251,3 +293,13 @@ function checkHealthColor(healthBar){
     healthBar.style.setProperty('--color2', '#8fffda');
   }
 }
+
+function toggleBackdrop(){
+    backdrop.classList.toggle("visible");
+}
+
+function toggleLogModal(){
+    const logModal = document.getElementById("log-modal");
+    logModal.classList.toggle("visible");
+}
+

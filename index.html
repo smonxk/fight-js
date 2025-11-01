@@ -16,6 +16,7 @@
     <script src="assets/scripts/app.js" defer></script>
   </head>
   <body>
+    <div id="backdrop"></div>
     <section id="navbar">
       <nav>
         <button><a href="">Characters</a></button>
@@ -36,6 +37,17 @@
       <button id="strong-attack-btn">STRONG ATTACK</button>
       <button id="heal-btn">HEAL</button>
       <button id="log-btn">SHOW LOG</button>
+    </section>
+    <section id="log-overlay">
+      <div class="modal" id="log-modal">
+        <div class="modal__title">
+          <h2 class>Battle log</h2>
+        </div>
+        <div id="modal-log-content"></div>
+        <div class="modal__actions">
+          <button id="btn--close-log">Close</button>
+        </div>
+      </div>
     </section>
   </body>
 </html>

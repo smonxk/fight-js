@@ -7,6 +7,10 @@ const strongAttackBtn = document.getElementById('strong-attack-btn');
 const healBtn = document.getElementById('heal-btn');
 const logBtn = document.getElementById('log-btn');
 const playerHealthSection = document.getElementById("player-health-section");
+const backdrop = document.getElementById("backdrop");
+const closeLogBtn = document.getElementById("btn--close-log");
+const modalLogContent = document.getElementById("modal-log-content");
+
 
 function adjustHealthBars(maxLife) {
   monsterHealthBar.max = maxLife;
