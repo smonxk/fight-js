@@ -195,4 +195,12 @@ nav a {
   color: yellow;
   max-height: 70vh;
   overflow: scroll;
+  scrollbar-width: none;
+}
+
+#btn--close-log {
+  background-color: yellow;
+  justify-self: center;
+  color: black;
+  border: none;
 }

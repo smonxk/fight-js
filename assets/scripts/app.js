@@ -48,6 +48,7 @@ healBtn.addEventListener("click", healPlayerHandler);
 logBtn.addEventListener("click", printLogHandler);
 backdrop.addEventListener("click", backdropHandler);
 closeLogBtn.addEventListener("click", closeLogBtnHandler);
+restartBtn.addEventListener("click", restartBtnHandler);
 
 //handlers
 
@@ -104,6 +105,13 @@ function closeLogBtnHandler(){
   toggleBackdrop();
   toggleLogModal();
 }
+
+function restartBtnHandler(){
+  resetGame(chosenMaxLife);
+  checkHealthColor(playerHealthBar);
+  checkHealthColor(monsterHealthBar)``
+}
+
 //functions
 
 function endRound() {

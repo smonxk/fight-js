@@ -10,6 +10,7 @@ const playerHealthSection = document.getElementById("player-health-section");
 const backdrop = document.getElementById("backdrop");
 const closeLogBtn = document.getElementById("btn--close-log");
 const modalLogContent = document.getElementById("modal-log-content");
+const restartBtn = document.querySelector("nav button:last-of-type")
 
 
 function adjustHealthBars(maxLife) {
