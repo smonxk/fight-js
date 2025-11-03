@@ -171,8 +171,15 @@ nav a {
 }
 
 .modal.visible {
-  display: block;
+  display: flex;
+  flex-direction: column;
   animation: fade-slide-in 0.3s ease-out forwards;
+  align-items: center;
+  gap: 0.7em;
+}
+
+#log-modal {
+  min-height: 90vh;
 }
 
 .modal__title {
@@ -196,6 +203,11 @@ nav a {
   max-height: 70vh;
   overflow: scroll;
   scrollbar-width: none;
+}
+
+.modal__actions {
+  bottom: 0;
+  position: absolute;
 }
 
 #btn--close-log {

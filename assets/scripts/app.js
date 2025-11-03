@@ -83,18 +83,32 @@ function healPlayerHandler() {
 function printLogHandler() {
   toggleBackdrop();
   toggleLogModal();
-  
-  for (const battle of battleLog){
-      const logTurnContent = document.createElement("div");
-      logTurnContent.innerHTML = `
-        <h4>Turn #${iteration + 1}</h4>
-        ${logContent(battleLog[iteration])}
-        `;
-      modalLogContent.appendChild(logTurnContent);
-      modalLogContent.scrollTop =  modalLogContent.scrollHeight;
-      iteration++;
+
+  if(battleLog.length === 0){
+    errorEmptyLog.innerHTML = "<h4>No battles logged. <br> Brace yourself for a fight!</h4>"
+    errorEmptyLog.style.textAlign = "center";
+    errorEmptyLog.style.position = "absolute";
+    errorEmptyLog.style.top = "40%";
+    errorEmptyLog.style.justifySelf = "center";
+    modalLogContent.appendChild(errorEmptyLog);
+  } else {
+    errorEmptyLog.style.display = "none";
+  }
+
+  while(iteration < battleLog.length){
+    const battle = battleLog[iteration];
+    const logTurnContent = document.createElement("div");
+   
+    logTurnContent.innerHTML = `
+      <h4>Turn #${iteration + 1}</h4>
+      ${logContent(battle)}
+      `;
+    modalLogContent.appendChild(logTurnContent);
+    modalLogContent.scrollTop =  modalLogContent.scrollHeight;
+    iteration++;
   }
 }
+
 
 function backdropHandler(){
   toggleBackdrop();
@@ -104,28 +118,27 @@ function backdropHandler(){
 function closeLogBtnHandler(){
   toggleBackdrop();
   toggleLogModal();
-}
+
+  if (battleLog[battleLog.length - 1].event === LOG_EVENT_GAME_OVER) {
+    modalLogContent.replaceChildren();
+    battleLog = [];
+    errorEmptyLog.innerHTML = "<h4>Let's fight again!</h4>"
+    errorEmptyLog.style.display = "block";
+  }
+  
+};
 
 function restartBtnHandler(){
-  resetGame(chosenMaxLife);
-  checkHealthColor(playerHealthBar);
-  checkHealthColor(monsterHealthBar)``
+     reset();
 }
 
 //functions
-
 function endRound() {
-  const initialPlayerHealth = currentPlayerHealth;
-  const damagePlayer = dealPlayerDamage(MONSTER_ATTACK_VALUE);
-  currentPlayerHealth -= damagePlayer;
-  checkHealthColor(playerHealthBar);
-  writeToLog(
-    LOG_EVENT_MONSTER_ATTACK,
-    damagePlayer,
-    currentMonsterHealth,
-    currentPlayerHealth
-  );
-
+  
+  if(currentMonsterHealth > 0){
+    attackPlayer();
+  }
+  
   if (currentPlayerHealth <= 0 && hasBonusLife) {
     hasBonusLife = false;
     removeBonusLife();
@@ -187,14 +200,26 @@ function attackMonster(mode) {
     endRound();
 }
 
+function attackPlayer(){
+  const initialPlayerHealth = currentPlayerHealth;
+  const damagePlayer = dealPlayerDamage(MONSTER_ATTACK_VALUE);
+  currentPlayerHealth -= damagePlayer;
+  checkHealthColor(playerHealthBar);
+  writeToLog(
+    LOG_EVENT_MONSTER_ATTACK,
+    damagePlayer,
+    currentMonsterHealth,
+    currentPlayerHealth
+  );
+}
+
 function reset() {
-  currentMonsterHealth = chosenMaxLife;
-  currentPlayerHealth = chosenMaxLife;
   resetGame(chosenMaxLife);
   checkHealthColor(monsterHealthBar);
   checkHealthColor(playerHealthBar);
-  hasBonusLife = true;
   addBonusLife();
+  hasBonusLife = true;
+  iteration = 0;
 }
 
 function writeToLog(event, value, monsterHealth, playerHealth) {
@@ -284,7 +309,7 @@ function logContent(contentInputEntry){
       break;
   }
 
-  console.log(fullLogText);
+  // console.log(fullLogText);
   return fullLogText;
 }
 
@@ -311,3 +336,5 @@ function toggleLogModal(){
     logModal.classList.toggle("visible");
 }
 
+//OK: po konci boje se ukaze print log
+//NENI OK: po kliknuti na close print logu po konci boje se neresetuje hra -- upravit cancel button handler
